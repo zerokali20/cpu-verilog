@@ -429,3 +429,5 @@ for the CO2070 8-bit single-cycle CPU project), do the following:
 - [ ] Lab 4 — Flow Control (j, beq)
 - [ ] Lab 4.5 — Extended ISA (optional bonus)
 - [ ] Lab 5 — Data Memory
+- [ ] Lab 6 —  Data Cache
+
