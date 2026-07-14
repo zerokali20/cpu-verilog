@@ -16,9 +16,9 @@ This project builds a complete single-cycle CPU **incrementally**, one lab at a 
 | **Lab 3** | Integration & Control | Top-level `cpu` module: PC, instruction fetch, control unit, 2's complement unit, MUXes — wires ALU + Register File together to run `add, sub, and, or, mov, loadi` | `cpu`, `control_unit` (optional) | ☐ |
 | **Lab 4** | Flow Control | Adds `j` and `beq` support: branch/jump target adder, `ZERO` flag from ALU, PC-mux control | ALU `ZERO` output, branch/jump target adder | ☐ |
 | **Lab 4.5 (Bonus)** | Extended ISA | Optional: `mult`, `sll`, `srl`, `sra`, `ror`, `bne` (max 2 new ALUOP codes reused cleverly) | New functional units sharing ALUOP slots | ☐ (optional, +20 bonus marks) |
-| **Lab 5** | Data Memory | Adds `lwd, lwi, swd, swi` — connects a 256-byte external data memory with `BUSYWAIT` stall handling | `data_memory` (given), stall FSM in `cpu` | ☐ |
+| **Lab 5** | Data Memory | Adds `lwd, lwi, swd, swi` — connects a 256-byte external data memory with `BUSYWAIT` stall handling | `data_memory` (given), stall FSM in `cpu` | ✅ |
+| **Lab 6** | Data Cache | Direct-mapped write-back cache between CPU and block-based memory. 8 lines × 4-byte blocks. FSM states: `IDLE`, `MEM_READ_START`, `MEM_READ`, `WRITE_BACK`, `WRITE_BACK_DONE`. | `dcache`, `data_memory_lab6` | ✅ |
 
-> Labs 6 and 7 (referenced in Lab 5's intro as "memory hierarchy" continuation — caches / pipelining) are **not yet detailed** in the provided documents. Treat Lab 5 as the current final milestone unless further specs are supplied.
 
 ---
 
@@ -263,7 +263,57 @@ See §2.3 for instruction semantics. Summary of engineering constraints:
 
 ---
 
-## 8. Master Signal / Module Naming Reference
+## 8. Lab 6 — Data Cache
+
+### 8.1 System-level view
+```
+CPU <──[byte interface, 8-bit]──> dcache <──[block interface, 32-bit]──> data_memory_lab6
+```
+
+### 8.2 Cache configuration
+| Parameter | Value | Notes |
+|---|---|---|
+| Lines | 8 | Index = 3 bits |
+| Block size | 4 bytes | Offset = 2 bits |
+| Tag width | 3 bits | bits[7:5] of CPU address |
+| Total capacity | 32 bytes | Direct-mapped |
+| Policy | Write-back, Write-allocate | — |
+
+All widths are `localparam` in `dcache.v` — trivial to change.
+
+### 8.3 CPU address breakdown (8-bit)
+```
+  [7:5] tag   [4:2] index   [1:0] offset
+  3 bits       3 bits        2 bits
+```
+
+### 8.4 Timing (timescale 1ns/100ps)
+| Operation | Delay |
+|---|---|
+| Indexing (read tag/valid/dirty/data arrays) | `#1` |
+| Tag compare + valid → `hit` | `#0.9` after indexing = **#1.9 total** |
+| Byte select (offset mux) | `#1` overlapping with indexing |
+| Synchronous write (write-hit / after fetch) | next posedge |
+
+### 8.5 FSM states
+| State | Encoding | Description |
+|---|---|---|
+| `IDLE` | `3'b000` | Hit resolved combinationally; miss detected → transition |
+| `MEM_READ` | `3'b001` | Waiting for memory to deliver fetched block (20 cycles) |
+| `WRITE_BACK` | `3'b010` | Evicting dirty block to memory (20 cycles) |
+| `WRITE_BACK_DONE` | `3'b011` | 1-cycle gap after write-back, asserts `mem_read` |
+| `MEM_READ_START` | `3'b100` | 1-cycle entry before `MEM_READ`, asserts `mem_read` |
+
+### 8.6 Miss penalty
+- **Clean miss** (dirty=0): `IDLE → MEM_READ_START → MEM_READ(×20) → IDLE` = **~22 cycles**
+- **Dirty miss** (dirty=1): `IDLE → WRITE_BACK(×20) → WRITE_BACK_DONE → MEM_READ(×20) → IDLE` = **~43 cycles**
+
+### 8.7 Lab 6 Deliverables
+- `groupXX_lab6.zip`: `dcache.v`, `data_memory_lab6.v`, `dcache_tb.v`, and timing screenshots.
+
+---
+
+## 9. Master Signal / Module Naming Reference
 
 Keep these names **exact** and consistent across all labs — the grading and any auto-checking tooling depends on it.
 
