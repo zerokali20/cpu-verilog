@@ -18,6 +18,7 @@ This project builds a complete single-cycle CPU **incrementally**, one lab at a 
 | **Lab 4.5 (Bonus)** | Extended ISA | Optional: `mult`, `sll`, `srl`, `sra`, `ror`, `bne` (max 2 new ALUOP codes reused cleverly) | New functional units sharing ALUOP slots |  ✅ (optional, +20 bonus marks) |
 | **Lab 5** | Data Memory | Adds `lwd, lwi, swd, swi` — connects a 256-byte external data memory with `BUSYWAIT` stall handling | `data_memory` (given), stall FSM in `cpu` | ✅ |
 | **Lab 6** | Data Cache | Direct-mapped write-back cache between CPU and block-based memory. 8 lines × 4-byte blocks. FSM states: `IDLE`, `MEM_READ_START`, `MEM_READ`, `WRITE_BACK`, `WRITE_BACK_DONE`. | `dcache`, `data_memory_lab6` | ✅ |
+|**Lab 7**| 
 
 
 ---
