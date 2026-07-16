@@ -25,9 +25,23 @@
  *   - Byte select (offset mux, for reads):  #1 overlapping with indexing
  *   - Write into block (write-hit / after fetch): synchronous, next posedge
  *
+ * FSM States:
+ *   IDLE            – Normal operation; hits resolved combinationally.
+ *   MEM_READ_START  – 1-cycle entry state (clean miss): drives mem_read so
+ *                     memory latches it; fetch proper starts next posedge.
+ *   MEM_READ        – Waits for memory to deliver the fetched block.
+ *   WRITE_BACK      – Evicts a dirty block to memory (20 cycles).
+ *   WRITE_BACK_DONE – 1-cycle gap between WB completion and fetch start;
+ *                     asserts mem_read for MEM_READ to see on entry.
+ *
+ * Miss-penalty summary:
+ *   Clean miss  (dirty==0): IDLE→MEM_READ_START→MEM_READ(20)→IDLE = 22 cycles
+ *   Dirty miss  (dirty==1): IDLE→WRITE_BACK(20)→WRITE_BACK_DONE→MEM_READ(20)→IDLE = 43 cycles
+ *   (After returning to IDLE, async path resolves access in ~1.9 time-units.)
+ *
  * Authors:  Isuru Nawinne, Kisaru Liyanage (skeleton);
- *           extended per Lab 6 specification.
- * Date  :   25/05/2020 (skeleton), extended 2024
+ *           completed per Lab 6 specification.
+ * Date  :   25/05/2020 (skeleton), extended 2024/2025
  */
 
 `timescale 1ns/100ps
@@ -158,6 +172,8 @@ module dcache (
      *  ─────────────────────
      *  States:
      *    IDLE            : normal operation; hits resolved combinationally
+     *    MEM_READ_START  : 1-cycle entry for clean miss — assert mem_read so
+     *                      memory sees it; fetch starts on next posedge
      *    MEM_READ        : waiting for memory to return a fetched block
      *    WRITE_BACK      : writing a dirty evicted block out to memory
      *    WRITE_BACK_DONE : 1-cycle gap between write-back completion and fetch start
@@ -170,8 +186,8 @@ module dcache (
     parameter MEM_READ_START  = 3'b100;   // 1-cycle gap: clean miss, assert mem_read
 
     reg [2:0] state, next_state;
-    // Tracks whether mem_busywait has been seen HIGH since entering MEM_READ
-    // (prevents premature exit before memory has had time to assert mem_busywait)
+    // Tracks whether mem_busywait has been seen HIGH since entering MEM_READ/WRITE_BACK.
+    // Prevents premature exit before memory has had time to assert mem_busywait.
     reg mem_busy_seen;
 
     /* ------------------------------------------------------------------
@@ -198,7 +214,9 @@ module dcache (
             end
 
             MEM_READ: begin
-                // Only exit when mem_busywait has been seen AND de-asserts
+                // Only exit when mem_busywait has been seen AND de-asserts.
+                // The mem_busy_seen guard prevents premature exit on the very
+                // first cycle when memory hasn't yet had a chance to assert.
                 if (mem_busy_seen && !mem_busywait)
                     next_state = IDLE;
                 else
@@ -335,6 +353,7 @@ module dcache (
                 mem_busy_seen <= 1'b0;
             else if ((state == MEM_READ || state == WRITE_BACK) && mem_busywait)
                 mem_busy_seen <= 1'b1;
+
             /* ── Write fetched block into cache (MEM_READ exit) ─────────
              * When mem_busywait de-asserts while in MEM_READ, the block
              * has arrived on mem_readdata.  We write it into the cache
@@ -342,7 +361,7 @@ module dcache (
              * the tag, valid, and dirty bits.
              * Dirty = 0 because the block was just fetched from memory.
              * ---------------------------------------------------------*/
-            if (state == MEM_READ && !mem_busywait) begin
+            if (state == MEM_READ && mem_busy_seen && !mem_busywait) begin
                 #1;   // SRAM write propagation delay
                 data_array [index] <= mem_readdata;
                 tag_array  [index] <= tag;
@@ -369,6 +388,14 @@ module dcache (
                 // Tag and valid are unchanged (block was already valid/correct)
             end
 
+            /* ── Write-miss: commit CPU's write after block is fetched ──
+             * When we return to IDLE from MEM_READ (i.e., next_state==IDLE
+             * while in MEM_READ), the fetched block will be in data_array.
+             * The write-hit path above handles the actual write on the
+             * FIRST IDLE cycle after fetch (since hit will now be 1).
+             * No extra logic needed here — the write-hit case covers it.
+             * ---------------------------------------------------------*/
+
         end
     end
 
@@ -376,12 +403,13 @@ module dcache (
      * Summary of miss-penalty cycles (for documentation / timing diagram):
      *
      *   Clean miss  (dirty==0):
-     *     IDLE → MEM_READ (20 cycles) → IDLE       = 21 cycles total
-     *     (The 1 extra cycle is the IDLE→MEM_READ transition edge.)
+     *     IDLE → MEM_READ_START (1 cycle) → MEM_READ (20 cycles) → IDLE
+     *     = 22 cycles total before original access re-resolves in IDLE.
      *
      *   Dirty miss  (dirty==1):
      *     IDLE → WRITE_BACK (20 cycles) → WRITE_BACK_DONE (1 cycle)
-     *          → MEM_READ (20 cycles) → IDLE          = 42 cycles total
+     *          → MEM_READ (20 cycles) → IDLE
+     *     = 43 cycles total.
      *
      *   After returning to IDLE, the combinational async path re-evaluates
      *   (~1.9 time units) and resolves the original read/write access.

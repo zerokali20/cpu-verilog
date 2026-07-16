@@ -76,7 +76,7 @@ module dcache_tb;
     );
 
     /* ── Instantiate block memory ────────────────────────────────────── */
-    data_memory_lab6 DMEM (
+    dmem DMEM (
         .mem_clock    (CLOCK),
         .mem_address  (mem_address),
         .mem_writedata(mem_writedata),
@@ -197,7 +197,7 @@ module dcache_tb;
     /* ── Main stimulus ────────────────────────────────────────────────── */
     initial begin
         $display("====================================================");
-        $display("  CO2070 Lab 6 — Data Cache Testbench");
+        $display("  CO2070 Lab 6 - Data Cache Testbench");
         $display("====================================================");
 
         // ── Reset ──────────────────────────────────────────────────────
@@ -219,14 +219,14 @@ module dcache_tb;
          *   Pre-loaded block 1: {0x07,0x06,0x05,0x04} → byte0 = 0x04
          * ───────────────────────────────────────────────────────────*/
         $display("");
-        $display("[TEST 1] Read miss (clean): ADDRESS=0x04 — expect READDATA=0x04, ~21 cycles BUSYWAIT");
+        $display("[TEST 1] Read miss (clean): ADDRESS=0x04 - expect READDATA=0x04, ~22 cycles BUSYWAIT");
         cache_read(8'h04, 8'h04, 1);
 
         /* ─────────────────────────────────────────────────────────────
          * Test 2: Read hit (block now in cache from Test 1)
          * ───────────────────────────────────────────────────────────*/
         $display("");
-        $display("[TEST 2] Read hit: ADDRESS=0x04 — expect READDATA=0x04, 0-1 cycle BUSYWAIT");
+        $display("[TEST 2] Read hit: ADDRESS=0x04 - expect READDATA=0x04, 0-1 cycle BUSYWAIT");
         cache_read(8'h04, 8'h04, 2);
 
         /* ─────────────────────────────────────────────────────────────
@@ -234,26 +234,26 @@ module dcache_tb;
          *   Write 0xBB to ADDRESS 0x04
          * ───────────────────────────────────────────────────────────*/
         $display("");
-        $display("[TEST 3] Write hit: ADDRESS=0x04, WRITEDATA=0xBB — expect short/no BUSYWAIT");
+        $display("[TEST 3] Write hit: ADDRESS=0x04, WRITEDATA=0xBB - expect short/no BUSYWAIT");
         cache_write(8'h04, 8'hBB, 3);
 
         /* ─────────────────────────────────────────────────────────────
          * Test 4: Read hit after write-hit — verify dirty data in cache
          * ───────────────────────────────────────────────────────────*/
         $display("");
-        $display("[TEST 4] Read hit after write-hit: ADDRESS=0x04 — expect READDATA=0xBB");
+        $display("[TEST 4] Read hit after write-hit: ADDRESS=0x04 - expect READDATA=0xBB");
         cache_read(8'h04, 8'hBB, 4);
 
         /* ─────────────────────────────────────────────────────────────
          * Test 5: Read miss (dirty → write-back required)
          *   ADDRESS=0xC4 → tag=3'b110, index=3'b001, offset=2'b00
          *   Cache line 1 is dirty with tag=0 (written in Test 3)
-         *   → write-back (20 cycles) + 1 gap cycle + fetch (20 cycles) ≈ 42 cycles
+         *   → write-back (20 cycles) + 1 gap cycle + fetch (20 cycles) ≈ 43 cycles
          *   mem_address for new block = {110,001} = 6'h31 = 49
          *   Pre-loaded block 49: b0=196=0xC4 → READDATA should be 0xC4
          * ───────────────────────────────────────────────────────────*/
         $display("");
-        $display("[TEST 5] Read miss (dirty+WB): ADDRESS=0xC4 — expect READDATA=0xC4, ~42 cycles BUSYWAIT");
+        $display("[TEST 5] Read miss (dirty+WB): ADDRESS=0xC4 - expect READDATA=0xC4, ~43 cycles BUSYWAIT");
         cache_read(8'hC4, 8'hC4, 5);
 
         /* ─────────────────────────────────────────────────────────────
@@ -262,10 +262,10 @@ module dcache_tb;
          *   Cache line 2 is empty → clean miss → fetch block, then write
          * ───────────────────────────────────────────────────────────*/
         $display("");
-        $display("[TEST 6a] Write miss (clean): ADDRESS=0x08, WRITEDATA=0xAA — expect ~21 cycles BUSYWAIT");
+        $display("[TEST 6a] Write miss (clean): ADDRESS=0x08, WRITEDATA=0xAA - expect ~22 cycles BUSYWAIT");
         cache_write(8'h08, 8'hAA, 6);
 
-        $display("[TEST 6b] Read hit after write-miss: ADDRESS=0x08 — expect READDATA=0xAA");
+        $display("[TEST 6b] Read hit after write-miss: ADDRESS=0x08 - expect READDATA=0xAA");
         cache_read(8'h08, 8'hAA, 7);
 
         /* ─────────────────────────────────────────────────────────────
