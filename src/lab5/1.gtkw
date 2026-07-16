@@ -1,0 +1,51 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Sun Jul 05 16:48:00 2026
+[*]
+[dumpfile] "D:\Eng Aca_ Computer Engineering\4 th sem\CO2070 -  Computer Architecture\LAB\repo\cpu-verilog\src\lab5\cpu_tb.vcd"
+[dumpfile_mtime] "Sun Jul 05 14:02:44 2026"
+[dumpfile_size] 45690
+[savefile] "D:\Eng Aca_ Computer Engineering\4 th sem\CO2070 -  Computer Architecture\LAB\repo\cpu-verilog\src\lab5\1.gtkw"
+[timestart] 0
+[size] 1536 793
+[pos] -191 -186
+*-15.000000 0 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] cpu_tb.
+[sst_width] 211
+[signals_width] 236
+[sst_expanded] 1
+[sst_vpaned_height] 222
+@28
+cpu_tb.CLK
+@24
+cpu_tb.PC[31:0]
+@28
+cpu_tb.DUT.READ
+cpu_tb.DUT.WRITE
+@24
+cpu_tb.DUT.BUSYWAIT
+@22
+cpu_tb.DUT.ADDRESS[7:0]
+cpu_tb.DUT.WRITEDATA[7:0]
+cpu_tb.DUT.READDATA[7:0]
+cpu_tb.DUT.OPCODE[7:0]
+cpu_tb.DUT.REGOUT1[7:0]
+cpu_tb.DUT.REGOUT2[7:0]
+@200
+-
+-
+@24
+cpu_tb.DUT.pc_next[31:0]
+cpu_tb.DUT.INSTRUCTION[31:0]
+@420
+cpu_tb.DUT.rt_addr[2:0]
+@24
+cpu_tb.DUT.out2_addr[2:0]
+@28
+cpu_tb.DUT.ALUOP[2:0]
+@22
+cpu_tb.DUT.alu_result[7:0]
+@24
+cpu_tb.DUT.WRITEENABLE
+[pattern_trace] 1
+[pattern_trace] 0
