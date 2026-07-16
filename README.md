@@ -1,7 +1,7 @@
 # CO2070 Computer Architecture — 8-bit Single-Cycle CPU (Verilog HDL)
 
 **Course:** CO2070 Computer Architecture, Department of Computer Engineering, University of Peradeniya
-**Project:** Design and implementation of an 8-bit single-cycle processor in Verilog, built incrementally across Labs 2 → 5 (+ bonus Lab 4.5)
+**Project:** Design and implementation of an 8-bit single-cycle processor in Verilog, built incrementally across Labs 1 → 7
 
 ---
 
@@ -11,11 +11,11 @@ This project builds a complete single-cycle CPU **incrementally**, one lab at a 
 
 | Lab | Title | What gets built | New modules / signals | Status |
 |---|---|---|---|---|
-| **Lab 2 – Part 1** | ALU | 8-bit ALU with 4 functional units (FORWARD, ADD, AND, OR) | `alu` | ☐ |
-| **Lab 2 – Part 2** | Register File | 8×8 register file (8 registers, 8 bits each) | `reg_file` | ☐ |
-| **Lab 3** | Integration & Control | Top-level `cpu` module: PC, instruction fetch, control unit, 2's complement unit, MUXes — wires ALU + Register File together to run `add, sub, and, or, mov, loadi` | `cpu`, `control_unit` (optional) | ☐ |
-| **Lab 4** | Flow Control | Adds `j` and `beq` support: branch/jump target adder, `ZERO` flag from ALU, PC-mux control | ALU `ZERO` output, branch/jump target adder | ☐ |
-| **Lab 4.5 (Bonus)** | Extended ISA | Optional: `mult`, `sll`, `srl`, `sra`, `ror`, `bne` (max 2 new ALUOP codes reused cleverly) | New functional units sharing ALUOP slots | ☐ (optional, +20 bonus marks) |
+| **Lab 2 – Part 1** | ALU | 8-bit ALU with 4 functional units (FORWARD, ADD, AND, OR) | `alu` | ✅ |
+| **Lab 2 – Part 2** | Register File | 8×8 register file (8 registers, 8 bits each) | `reg_file` | ✅ |
+| **Lab 3** | Integration & Control | Top-level `cpu` module: PC, instruction fetch, control unit, 2's complement unit, MUXes — wires ALU + Register File together to run `add, sub, and, or, mov, loadi` | `cpu`, `control_unit` (optional) | ✅ |
+| **Lab 4** | Flow Control | Adds `j` and `beq` support: branch/jump target adder, `ZERO` flag from ALU, PC-mux control | ALU `ZERO` output, branch/jump target adder |  ✅ |
+| **Lab 4.5 (Bonus)** | Extended ISA | Optional: `mult`, `sll`, `srl`, `sra`, `ror`, `bne` (max 2 new ALUOP codes reused cleverly) | New functional units sharing ALUOP slots |  ✅ (optional, +20 bonus marks) |
 | **Lab 5** | Data Memory | Adds `lwd, lwi, swd, swi` — connects a 256-byte external data memory with `BUSYWAIT` stall handling | `data_memory` (given), stall FSM in `cpu` | ✅ |
 | **Lab 6** | Data Cache | Direct-mapped write-back cache between CPU and block-based memory. 8 lines × 4-byte blocks. FSM states: `IDLE`, `MEM_READ_START`, `MEM_READ`, `WRITE_BACK`, `WRITE_BACK_DONE`. | `dcache`, `data_memory_lab6` | ✅ |
 
@@ -422,12 +422,11 @@ for the CO2070 8-bit single-cycle CPU project), do the following:
 ---
 
 ## 11. Progress Tracker
-
-- [ ] Lab 2 Part 1 — ALU
-- [ ] Lab 2 Part 2 — Register File
-- [ ] Lab 3 — Integration & Control
-- [ ] Lab 4 — Flow Control (j, beq)
-- [ ] Lab 4.5 — Extended ISA (optional bonus)
-- [ ] Lab 5 — Data Memory
-- [ ] Lab 6 —  Data Cache
+- ✅ Lab 2 Part 1 — ALU
+- ✅ Lab 2 Part 2 — Register File
+- ✅ Lab 3 — Integration & Control
+- ✅ Lab 4 — Flow Control (j, beq)
+- ✅ Lab 4.5 — Extended ISA (optional bonus)
+- ✅ Lab 5 — Data Memory
+- ✅ Lab 6 —  Data Cache
 
